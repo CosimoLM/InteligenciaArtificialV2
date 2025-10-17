@@ -1,5 +1,84 @@
 [
   {
+    "ContainingType": "IA_V2.Api.Controllers.TextController",
+    "Method": "GetAll",
+    "RelativePath": "api/Text",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IA_V2.Api.Controllers.TextController",
+    "Method": "Insert",
+    "RelativePath": "api/Text",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "IA_V2.Infrastructure.DTOs.TextDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IA_V2.Api.Controllers.TextController",
+    "Method": "GetById",
+    "RelativePath": "api/Text/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IA_V2.Api.Controllers.TextController",
+    "Method": "Update",
+    "RelativePath": "api/Text/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "IA_V2.Infrastructure.DTOs.TextDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IA_V2.Api.Controllers.TextController",
+    "Method": "Delete",
+    "RelativePath": "api/Text/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "IA_V2.Api.Controllers.UserController",
     "Method": "GetAll",
     "RelativePath": "api/User",
