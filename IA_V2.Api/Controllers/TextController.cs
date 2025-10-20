@@ -28,19 +28,32 @@ namespace IA_V2.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var users = await _textService.GetAllTextAsync();
-            var result = _mapper.Map<IEnumerable<UserDTO>>(users);
-            return Ok(result);
+            try
+            {
+                var texts = await _textService.GetAllTextAsync();
+                var result = _mapper.Map<IEnumerable<TextDTO>>(texts);
+                return Ok(result); 
+            }
+            catch (Exception err)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, err.Message);
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-
-            var text = await _textService.GetTextByIdAsync(id);
-            var textDto = _mapper.Map<TextDTO>(text);
-            var response = new ApiResponse<TextDTO>(textDto);
-            return Ok(response);
+            try
+            {
+                var text = await _textService.GetTextByIdAsync(id);
+                var textDto = _mapper.Map<TextDTO>(text);
+                var response = new ApiResponse<TextDTO>(textDto);
+                return Ok(response);
+            }
+            catch (Exception err)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, err.Message);
+            }
         }
         [HttpPost]
         public async Task<IActionResult> Insert(TextDTO dto)
@@ -91,11 +104,15 @@ namespace IA_V2.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-
-
-            //var user = await _userService.GetUserAsync(id);
-            await _textService.DeleteTextAsync(id);
-            return Ok(new { message = $"El usuario con ID {id} fue eliminado correctamente." });
+            try
+            {
+                await _textService.DeleteTextAsync(id);
+                return Ok(new { message = $"El texto con ID {id} fue eliminado correctamente." });
+            }
+            catch (Exception err)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, err.Message);
+            }
         }
     }
 }

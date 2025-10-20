@@ -28,19 +28,34 @@ namespace IA_V2.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var users = await _userService.GetAllUserAsync();
-            var result = _mapper.Map<IEnumerable<UserDTO>>(users);
-            return Ok(result);
+            try
+            {
+                var users = await _userService.GetAllUserAsync();
+                var result = _mapper.Map<IEnumerable<UserDTO>>(users);
+                return Ok(result);
+            }
+            catch (Exception err)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, err.Message);
+            }
+
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            
-            var user = await _userService.GetUserAsync(id);
-            var userDto = _mapper.Map<UserDTO>(user);
-            var response = new ApiResponse<UserDTO>(userDto);
-            return Ok(response);
+            try 
+            {
+                var user = await _userService.GetUserAsync(id);
+                var userDto = _mapper.Map<UserDTO>(user);
+                var response = new ApiResponse<UserDTO>(userDto);
+                return Ok(response);
+            }
+            catch (Exception err)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, err.Message);
+            }
+           
         }
         [HttpPost]
         public async Task<IActionResult> Insert(UserDTO dto)
@@ -92,11 +107,15 @@ namespace IA_V2.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-     
-
-            //var user = await _userService.GetUserAsync(id);
-            await _userService.DeleteUserAsync(id);
-            return Ok(new { message = $"El usuario con ID {id} fue eliminado correctamente." });
+            try
+            {
+                await _userService.DeleteUserAsync(id);
+                return Ok(new { message = $"El usuario con ID {id} fue eliminado correctamente." });
+            }
+            catch (Exception err)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, err.Message);
+            }
         }
     }
 }

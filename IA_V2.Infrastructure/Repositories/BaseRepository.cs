@@ -23,7 +23,14 @@ namespace IA_V2.Infrastructure.Repositories
 
         public async Task<IEnumerable<T>> GetAll()
         {
-            return await _entities.ToListAsync();
+            try 
+            {
+                return await _entities.ToListAsync();
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception($"Error al obtener entidades {typeof(T).Name}: {ex.Message}", ex);
+            }    
         }
 
         public async Task<T> GetById(int id)
@@ -66,9 +73,16 @@ namespace IA_V2.Infrastructure.Repositories
 
         public async Task Delete(int id)
         {
-            T entity = await GetById(id);
-            _entities.Remove(entity);
-            await _context.SaveChangesAsync();
+            try 
+            {
+                T entity = await GetById(id);
+                _entities.Remove(entity);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al eliminar entidad {typeof(T).Name}: {ex.Message}", ex);
+            }
         }
     }
 }

@@ -27,8 +27,7 @@ namespace IA_V2.Core.Services
             return await _predictionRepository.GetById(id);
         }
 
-        public async Task InsertPredictionAsync(Prediction prediction) => await _predictionRepository.Add(prediction);
-
+    
         public async Task UpdatePredictionAsync(Prediction prediction) => await _predictionRepository.Update(prediction);
 
         public async Task DeletePredictionAsync(int id) => await _predictionRepository.Delete(id);

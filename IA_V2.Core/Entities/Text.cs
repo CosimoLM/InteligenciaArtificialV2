@@ -9,7 +9,7 @@ namespace IA_V2.Core.Entities
     public class Text : BaseEntity
     {
         //public int Id { get; set; }
-        public string Content { get; set; }
+        public string? Content { get; set; }
         public DateTime FechaEnvio { get; set; } = DateTime.UtcNow;
 
         public int? UserId { get; set; }

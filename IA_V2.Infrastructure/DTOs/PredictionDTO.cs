@@ -9,7 +9,7 @@ namespace IA_V2.Infrastructure.DTOs
     public class PredictionDTO
     {
         public int Id { get; set; }
-        public string Result { get; set; }
+        public string? Result { get; set; }
         public double Precision { get; set; }
         public DateTime Date { get; set; }
         public int TextId { get; set; }

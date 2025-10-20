@@ -12,10 +12,7 @@ namespace IA_V2.Infrastructure.Validators
     {
         public PredictionDTOValidator()
         {
-            RuleFor(p => p.Id)
-                .GreaterThan(0)
-                .WithMessage("El IdUser debe ser mayor que 0");
-
+          
             RuleFor(p => p.Result)
                 .NotEmpty().WithMessage("El resultado de la predicción es obligatorio.");
 

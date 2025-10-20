@@ -1,5 +1,84 @@
 [
   {
+    "ContainingType": "IA_V2.Api.Controllers.PredictionController",
+    "Method": "GetAll",
+    "RelativePath": "api/Prediction",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IA_V2.Api.Controllers.PredictionController",
+    "Method": "GetById",
+    "RelativePath": "api/Prediction/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IA_V2.Api.Controllers.PredictionController",
+    "Method": "Update",
+    "RelativePath": "api/Prediction/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "IA_V2.Infrastructure.DTOs.PredictionDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IA_V2.Api.Controllers.PredictionController",
+    "Method": "Delete",
+    "RelativePath": "api/Prediction/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IA_V2.Api.Controllers.PredictionController",
+    "Method": "Predecir",
+    "RelativePath": "api/Prediction/predecir",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "input",
+        "Type": "IA_V2.Core.Services.TextInput",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "IA_V2.Api.Controllers.TextController",
     "Method": "GetAll",
     "RelativePath": "api/Text",

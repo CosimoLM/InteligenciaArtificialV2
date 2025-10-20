@@ -11,7 +11,7 @@ namespace IA_V2.Core.Interfaces
     {
         Task<IEnumerable<Prediction>> GetAllPredictionAsync();
         Task<Prediction> GetPredictionByIdAsync(int id);
-        Task InsertPredictionAsync(Prediction prediction);
+
         Task UpdatePredictionAsync(Prediction prediction);
         Task DeletePredictionAsync(int id);
     }

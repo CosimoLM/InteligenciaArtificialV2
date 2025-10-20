@@ -12,3 +12,4 @@ C:\Users\liloc\OneDrive\Documents\Universidad\11. Semestre 2-2025\Tecnologías W
 C:\Users\liloc\OneDrive\Documents\Universidad\11. Semestre 2-2025\Tecnologías Web I\InteligenciaArtificialV2\IA_V2.Core\obj\Debug\net9.0\IA_V2.Core.pdb
 C:\Users\liloc\OneDrive\Documents\Universidad\11. Semestre 2-2025\Tecnologías Web I\InteligenciaArtificialV2\IA_V2.Core\obj\Debug\net9.0\IA_V2.Core.genruntimeconfig.cache
 C:\Users\liloc\OneDrive\Documents\Universidad\11. Semestre 2-2025\Tecnologías Web I\InteligenciaArtificialV2\IA_V2.Core\obj\Debug\net9.0\ref\IA_V2.Core.dll
+C:\Users\liloc\OneDrive\Documents\Universidad\11. Semestre 2-2025\Tecnologías Web I\InteligenciaArtificialV2\IA_V2.Core\obj\Debug\net9.0\IA_V2.Core.sourcelink.json

@@ -29,7 +29,8 @@ builder.Services.AddValidatorsFromAssemblyContaining<UserDTOValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<TextDTOValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<PredictionDTOValidator>();
 
-
+//ML
+builder.Services.AddSingleton<ModeloIAService>();
 // Add services to the container.
 
 builder.Services.AddControllers();

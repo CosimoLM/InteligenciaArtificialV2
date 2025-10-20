@@ -10,7 +10,7 @@ namespace IA_V2.Infrastructure.DTOs
     {
         public int Id { get; set; }
         public string Content { get; set; }
-        public DateTime CreationDate { get; set; }
+        public DateTime Date { get; set; }
         public int UserId { get; set; }
     }
 }
