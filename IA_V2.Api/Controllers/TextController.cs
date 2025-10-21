@@ -45,6 +45,9 @@ namespace IA_V2.Api.Controllers
         {
             try
             {
+                var validation = await _validationService.ValidateAsync(id);
+                if (!validation.IsValid)
+                    return BadRequest(new { errores = validation.Errors });
                 var text = await _textService.GetTextByIdAsync(id);
                 var textDto = _mapper.Map<TextDTO>(text);
                 var response = new ApiResponse<TextDTO>(textDto);
@@ -106,6 +109,9 @@ namespace IA_V2.Api.Controllers
         {
             try
             {
+                var validation = await _validationService.ValidateAsync(id);
+                if (!validation.IsValid)
+                    return BadRequest(new { errores = validation.Errors });
                 await _textService.DeleteTextAsync(id);
                 return Ok(new { message = $"El texto con ID {id} fue eliminado correctamente." });
             }

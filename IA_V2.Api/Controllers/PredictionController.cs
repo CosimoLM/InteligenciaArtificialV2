@@ -51,6 +51,9 @@ namespace IA_V2.Api.Controllers
         {
             try
             {
+                var validation = await _validationService.ValidateAsync(id);
+                if (!validation.IsValid)
+                    return BadRequest(new { errores = validation.Errors });
                 var prediction = await _predictionService.GetPredictionByIdAsync(id);
                 var predictionDto = _mapper.Map<PredictionDTO>(prediction);
                 var response = new ApiResponse<PredictionDTO>(predictionDto);
@@ -66,6 +69,7 @@ namespace IA_V2.Api.Controllers
         {
             try
             {
+
                 if (string.IsNullOrWhiteSpace(input.Texto))
                     return BadRequest(new { message = "Debe ingresar un texto para analizar." });
 
@@ -115,6 +119,9 @@ namespace IA_V2.Api.Controllers
         {
             try
             {
+                var validation = await _validationService.ValidateAsync(id);
+                if (!validation.IsValid)
+                    return BadRequest(new { errores = validation.Errors });
                 await _predictionService.DeletePredictionAsync(id);
                 return Ok(new { message = $"La prediccion con ID {id} fue eliminada correctamente." });
             }

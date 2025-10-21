@@ -30,6 +30,7 @@ namespace IA_V2.Api.Controllers
         {
             try
             {
+
                 var users = await _userService.GetAllUserAsync();
                 var result = _mapper.Map<IEnumerable<UserDTO>>(users);
                 return Ok(result);
@@ -46,6 +47,9 @@ namespace IA_V2.Api.Controllers
         {
             try 
             {
+                var validation = await _validationService.ValidateAsync(id);
+                if (!validation.IsValid)
+                    return BadRequest(new { errores = validation.Errors });
                 var user = await _userService.GetUserAsync(id);
                 var userDto = _mapper.Map<UserDTO>(user);
                 var response = new ApiResponse<UserDTO>(userDto);
@@ -109,6 +113,9 @@ namespace IA_V2.Api.Controllers
         {
             try
             {
+                var validation = await _validationService.ValidateAsync(id);
+                if (!validation.IsValid)
+                    return BadRequest(new { errores = validation.Errors });
                 await _userService.DeleteUserAsync(id);
                 return Ok(new { message = $"El usuario con ID {id} fue eliminado correctamente." });
             }
