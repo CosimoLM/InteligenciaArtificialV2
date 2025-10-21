@@ -1,2 +1,5 @@
 .vs/
-IA_V2.Api/bin/**
+IA_V2.Api/bin/
+IA_V2.Api/obj/
+IA_V2.Core/bin/
+IA_V2.Core/obj/
