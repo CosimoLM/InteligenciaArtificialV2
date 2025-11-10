@@ -2,47 +2,98 @@ using FluentValidation;
 using IA_V2.Core.Interfaces;
 using IA_V2.Core.Services;
 using IA_V2.Infrastructure.Data;
+using IA_V2.Infrastructure.Filters;
 using IA_V2.Infrastructure.Repositories;
 using IA_V2.Infrastructure.Validators;
 using Microsoft.EntityFrameworkCore;
 
-var builder = WebApplication.CreateBuilder(args);
+public class Program
+{
+    public static void Main (string[] args)
 
-#region Configurar la BD SqlServer
-var connectionString = builder.Configuration.GetConnectionString("ConnectionSqlServer");
-builder.Services.AddDbContext<InteligenciaArtificialV2Context>(options => options.UseSqlServer(connectionString));
-#endregion
+    {
+        var builder = WebApplication.CreateBuilder(args);
 
-//Automapper
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        // Configurar User Secrets solo en Desarrollo
+        if (builder.Environment.IsDevelopment())
+        {
+            builder.Configuration.AddUserSecrets<Program>();
+        }
+        #region Configurar la BD SqlServer
+        var connectionString = builder.Configuration.GetConnectionString("ConnectionSqlServer");
+        builder.Services.AddDbContext<InteligenciaArtificialV2Context>(options => options.UseSqlServer(connectionString));
+        #endregion
 
-#region Repositorios
-builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ITextService, TextService>();
-builder.Services.AddScoped<IPredictionService, PredictionService>();
-#endregion
+        //Dapper
+        builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
+        builder.Services.AddScoped<IDapperContext, DapperContext>();
 
-//Validaciones
-builder.Services.AddScoped<IValidationService, ValidationService>();
-builder.Services.AddValidatorsFromAssemblyContaining<UserDTOValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<TextDTOValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<PredictionDTOValidator>();
+        //Automapper
+        builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-//ML
-builder.Services.AddSingleton<ModeloIAService>();
-// Add services to the container.
+        #region Repositorios y servicios
+        builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+        builder.Services.AddScoped<IUserService, UserService>();
+        builder.Services.AddScoped<ITextService, TextService>();
+        builder.Services.AddScoped<IPredictionService, PredictionService>();
+        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+        #endregion
 
-builder.Services.AddControllers();
+        //Validaciones
+        builder.Services.AddScoped<IValidationService, ValidationService>();
+        builder.Services.AddValidatorsFromAssemblyContaining<UserDTOValidator>();
+        builder.Services.AddValidatorsFromAssemblyContaining<TextDTOValidator>();
+        builder.Services.AddValidatorsFromAssemblyContaining<PredictionDTOValidator>();
 
-var app = builder.Build();
+        //ML
+        builder.Services.AddSingleton<ModeloIAService>();
+        // Add services to the container.
 
-// Configure the HTTP request pipeline.
+        builder.Services.AddControllers(options =>
+        {
+            options.Filters.Add<GlobalExceptionFilter>();
+        });
+        // Configurar Swagger
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v2", new()
+            {
+                Title = "Backend IA Text Analysis API",
+                Version = "v2",
+                Description = "API para análisis de textos usando IA",
+                Contact = new()
+                {
+                    Name = "Equipo de Desarrollo",
+                    Email = "liam.lopez@ucb.edu.bo"
+                }
+            });
 
-app.UseHttpsRedirection();
+            var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            options.IncludeXmlComments(xmlPath);
 
-app.UseAuthorization();
+            options.EnableAnnotations();
+        });
 
-app.MapControllers();
+        var app = builder.Build();
 
-app.Run();
+        // Configure the HTTP request pipeline.
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/swagger/v2/swagger.json", "Backend IA Text Analysis API v2");
+                options.RoutePrefix = string.Empty;
+            });
+        }
+        app.UseHttpsRedirection();
+    
+        app.UseAuthorization();
+
+        app.MapControllers();
+
+        app.Run();
+    }
+}

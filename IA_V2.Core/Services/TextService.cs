@@ -1,45 +1,147 @@
-﻿using IA_V2.Core.Interfaces;
+﻿using IA_V2.Core.CustomEntities;
+using IA_V2.Core.Entities;
+using IA_V2.Core.Exceptions;
+using IA_V2.Core.Interfaces;
+using IA_V2.Core.QueryFilters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using IA_V2.Core.Entities;
 
 namespace IA_V2.Core.Services
 {
     public class TextService : ITextService
     {
-        private readonly IBaseRepository<Text> _textRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IDapperContext _dapper;
+        private readonly ModeloIAService _modeloIAService;
 
-        public TextService(IBaseRepository<Text> textRepository)
+        public TextService(IUnitOfWork unitOfWork, IDapperContext dapper, ModeloIAService modeloIAService)
         {
-            _textRepository = textRepository;
+            _unitOfWork = unitOfWork;
+            _dapper = dapper;
+            _modeloIAService = modeloIAService;
         }
 
-        public async Task<IEnumerable<Text>> GetAllTextAsync()
+        public async Task<ResponseData> GetAllTextsAsync(TextQueryFilter filters)
         {
-            return await _textRepository.GetAll();
+            var texts = await _unitOfWork.TextRepository.GetAll();
+
+            // Aplicar filtros
+            if (filters.UserId.HasValue)
+                texts = texts.Where(t => t.UserId == filters.UserId.Value);
+
+            if (!string.IsNullOrEmpty(filters.SearchText))
+                texts = texts.Where(t => t.Content.ToLower().Contains(filters.SearchText.ToLower()));
+
+            if (filters.FromDate.HasValue)
+                texts = texts.Where(t => t.FechaEnvio >= filters.FromDate.Value);
+
+            if (filters.ToDate.HasValue)
+                texts = texts.Where(t => t.FechaEnvio <= filters.ToDate.Value);
+
+            var pagedTexts = PagedList<object>.Create(texts, filters.PageNumber, filters.PageSize);
+
+            if (pagedTexts.Any())
+            {
+                return new ResponseData()
+                {
+                    Messages = new Message[] { new() {
+                    Type = "Information",
+                    Description = "Textos recuperados correctamente"
+                }},
+                    Pagination = pagedTexts,
+                    StatusCode = HttpStatusCode.OK
+                };
+            }
+            else
+            {
+                return new ResponseData()
+                {
+                    Messages = new Message[] { new() {
+                    Type = "Warning",
+                    Description = "No se encontraron textos"
+                }},
+                    Pagination = pagedTexts,
+                    StatusCode = HttpStatusCode.NotFound
+                };
+            }
+        }
+
+        public async Task<IEnumerable<Text>> GetAllTextDapperAsync(int limit = 10)
+        {
+            var texts = await _unitOfWork.TextRepository.GetAllTextsDapperAsync(limit);
+            return texts;
         }
 
         public async Task<Text> GetTextByIdAsync(int id)
         {
-            return await _textRepository.GetById(id);
+            var text = await _unitOfWork.TextRepository.GetById(id);
+            if (text == null)
+                throw new BusinessException($"Texto con ID {id} no encontrado");
+            return text;
         }
 
         public async Task InsertTextAsync(Text text)
         {
-            await _textRepository.Add(text);
+            // Validar que el usuario existe
+            var user = await _unitOfWork.UserRepository.GetById(text.UserId.Value);
+            if (user == null)
+                throw new BusinessException("El usuario no existe");
+
+            // Validar contenido (mínimo de caracteres)
+            if (string.IsNullOrWhiteSpace(text.Content) || text.Content.Length < 5)
+                throw new BusinessException("El texto debe tener al menos 5 caracteres");
+
+            // Analizar con IA y guardar predicción
+            var predictionResult = _modeloIAService.Predecir(text.Content);
+
+            var prediction = new Prediction
+            {
+                TextId = text.Id,
+                UserId = text.UserId,
+                Result = predictionResult.Categoria,
+                Probability = predictionResult.Confidencias?.Max() ?? 0.0,
+                Date = DateTime.UtcNow
+            };
+
+            await _unitOfWork.TextRepository.Add(text);
+            await _unitOfWork.PredictionRepository.Add(prediction);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task UpdateTextAsync(Text text)
         {
-            await _textRepository.Update(text);
+            var existingText = await GetTextByIdAsync(text.Id);
+
+            // Lógica de actualización
+            existingText.Content = text.Content;
+
+            await _unitOfWork.TextRepository.Update(existingText);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task DeleteTextAsync(int id)
         {
-            await _textRepository.Delete(id);
+            var text = await GetTextByIdAsync(id);
+
+            // Eliminar predicciones asociadas primero
+            var predictions = await _unitOfWork.PredictionRepository.GetAll();
+            var textPredictions = predictions.Where(p => p.TextId == id);
+            foreach (var prediction in textPredictions)
+            {
+                await _unitOfWork.PredictionRepository.Delete(prediction.Id);
+            }
+
+            await _unitOfWork.TextRepository.Delete(id);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public Task<IEnumerable<Text>> GetAllTextAsync()
+        {
+            throw new NotImplementedException();
         }
     }
 }

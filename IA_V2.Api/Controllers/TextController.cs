@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using IA_V2.Api.Responses;
+using IA_V2.Core.CustomEntities;
 using IA_V2.Core.Entities;
 using IA_V2.Core.Interfaces;
+using IA_V2.Core.QueryFilters;
 using IA_V2.Infrastructure.DTOs;
 using IA_V2.Infrastructure.Validators;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using System.Net;
 
 namespace IA_V2.Api.Controllers
@@ -26,17 +29,57 @@ namespace IA_V2.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] TextQueryFilter filters)
         {
             try
             {
                 var texts = await _textService.GetAllTextAsync();
-                var result = _mapper.Map<IEnumerable<TextDTO>>(texts);
-                return Ok(result); 
+
+                // Aplicar filtros
+                if (filters.UserId.HasValue)
+                    texts = texts.Where(t => t.UserId == filters.UserId.Value);
+
+                if (!string.IsNullOrEmpty(filters.SearchText))
+                    texts = texts.Where(t => t.Content.Contains(filters.SearchText));
+
+                if (filters.FromDate.HasValue)
+                    texts = texts.Where(t => t.FechaEnvio >= filters.FromDate.Value);
+
+                if (filters.ToDate.HasValue)
+                    texts = texts.Where(t => t.FechaEnvio <= filters.ToDate.Value);
+
+                // Aplicar paginación
+                var pagedTexts = PagedList<Text>.Create(texts, filters.PageNumber, filters.PageSize);
+                var textsDto = _mapper.Map<IEnumerable<TextDTO>>(pagedTexts);
+
+                var pagination = new Pagination
+                {
+                    TotalCount = pagedTexts.TotalCount,
+                    PageSize = pagedTexts.PageSize,
+                    CurrentPage = pagedTexts.CurrentPage,
+                    TotalPages = pagedTexts.TotalPages,
+                    HasNextPage = pagedTexts.HasNextPage,
+                    HasPreviousPage = pagedTexts.HasPreviousPage
+                };
+
+                var response = new ApiResponse<IEnumerable<TextDTO>>(textsDto)
+                {
+                    Pagination = pagination,
+                    Messages = new Message[] { new() {
+                        Type = "Information",
+                        Description = "Textos recuperados correctamente"
+                    }}
+                };
+
+                return Ok(response);
             }
             catch (Exception err)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError, err.Message);
+                var responsePost = new ResponseData()
+                {
+                    Messages = new Message[] { new() { Type = "Error", Description = err.Message } },
+                };
+                return StatusCode(500, responsePost);
             }
         }
 

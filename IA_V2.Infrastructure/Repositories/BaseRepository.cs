@@ -14,7 +14,7 @@ namespace IA_V2.Infrastructure.Repositories
         : IBaseRepository<T> where T : BaseEntity
     {
         private readonly InteligenciaArtificialV2Context _context;
-        private readonly DbSet<T> _entities;
+        protected readonly DbSet<T> _entities;
         public BaseRepository(InteligenciaArtificialV2Context context)
         {
             _context = context;
@@ -50,7 +50,7 @@ namespace IA_V2.Infrastructure.Repositories
             try
             {
                 _entities.Add(entity);
-                await _context.SaveChangesAsync();
+                //await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -63,7 +63,7 @@ namespace IA_V2.Infrastructure.Repositories
             try 
             {
                 _entities.Update(entity);
-                await _context.SaveChangesAsync();
+                //await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -77,7 +77,7 @@ namespace IA_V2.Infrastructure.Repositories
             {
                 T entity = await GetById(id);
                 _entities.Remove(entity);
-                await _context.SaveChangesAsync();
+                //await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {

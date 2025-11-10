@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IA_V2.Core.ML
+namespace IA_V2.Core.Enum
 {
-    public class TextDataInput
+    public enum DatabaseProvider
     {
-        public string Texto { get; set; } = string.Empty;
+        SqlServer,
+        MySql
     }
 }
